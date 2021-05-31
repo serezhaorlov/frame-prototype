@@ -1,7 +1,9 @@
 <template>
   <div class="frame">
-    <div v-if="error">Ошибка при загрузке видеокадра {{ frameId }}</div>
-    <component v-else :is="currentFrame" />
+    <p class="frame__error" v-if="error">
+      Ошибка при загрузке видеокадра {{ frameId }}
+    </p>
+    <component class="frame__svg" v-else :is="currentFrame" />
   </div>
 </template>
 
@@ -25,22 +27,21 @@ export default defineComponent({
 
     if (!frame) {
       error.value = true;
-      return;
-    }
+    } else {
+      const executeScenario = new Function('value', frame.scenario);
 
-    const executeScenario = new Function('value', frame.scenario);
-
-    import(`@/assets/frames/${frameId}.svg`).then(async (frame) => {
-      currentFrame.value = frame.default;
-      await nextTick();
-      watch(value, (value: number) => {
-        executeScenario(value);
+      import(`@/assets/frames/${frameId}.svg`).then(async (frame) => {
+        currentFrame.value = frame.default;
+        await nextTick();
+        watch(value, (value: number) => {
+          executeScenario(value);
+        });
       });
-    });
 
-    setInterval(() => {
-      value.value = Math.round(Math.random() * 100);
-    }, freq.value);
+      setInterval(() => {
+        value.value = Math.round(Math.random() * 100);
+      }, freq.value);
+    }
 
     return { currentFrame, frameId, error };
   },
@@ -50,8 +51,16 @@ export default defineComponent({
 <style lang="less" scoped>
 .frame {
   display: flex;
-  align-items: center;
   justify-content: center;
-  background-color: #090e1c;
+  align-items: center;
+
+  &__error {
+    color: red;
+  }
+
+  &__svg {
+    width: 100%;
+    height: 100%;
+  }
 }
 </style>

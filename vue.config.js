@@ -14,8 +14,13 @@ module.exports = {
         svgo: {
           plugins: [
             {
-              // removeUnknownsAndDefaults: false,
+              removeUnknownsAndDefaults: false,
+            },
+            {
               cleanupIDs: false,
+            },
+            {
+              removeViewBox: false,
             },
           ],
         },
